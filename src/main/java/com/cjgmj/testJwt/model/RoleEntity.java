@@ -11,7 +11,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "authorities", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "authority" }) })
-public class Role implements Serializable {
+public class RoleEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

@@ -5,11 +5,11 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.cjgmj.testJwt.model.User;
+import com.cjgmj.testJwt.model.UserEntity;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, Long> {
-	
-	public Optional<User> findByUsername(String username);
+public interface UserRepository extends CrudRepository<UserEntity, Long> {
+
+	public Optional<UserEntity> findByUsername(String username);
 
 }

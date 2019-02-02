@@ -14,7 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cjgmj.testJwt.model.Role;
+import com.cjgmj.testJwt.model.RoleEntity;
+import com.cjgmj.testJwt.model.UserEntity;
 import com.cjgmj.testJwt.repository.UserRepository;
 
 @Service
@@ -26,21 +27,21 @@ public class JpaUserDetailsService implements UserDetailsService {
 	@Override
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<com.cjgmj.testJwt.model.User> user = userRepository.findByUsername(username);
+		Optional<UserEntity> user = userRepository.findByUsername(username);
 
 		if (user.isPresent()) {
 			List<GrantedAuthority> authorities = new ArrayList<>();
 
-			for (Role role : user.get().getRoles()) {
+			for (RoleEntity role : user.get().getRoles()) {
 				authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
 			}
 
-			if(authorities.isEmpty()) {
+			if (authorities.isEmpty()) {
 				throw new UsernameNotFoundException("El usuario no tiene roles asignados");
 			}
-			
-			return new User(user.get().getUsername(), user.get().getPassword(), user.get().getEnabled(), true,
-					true, true, authorities);
+
+			return new User(user.get().getUsername(), user.get().getPassword(), user.get().getEnabled(), true, true,
+					true, authorities);
 		}
 
 		throw new UsernameNotFoundException("El usuario no existe");
