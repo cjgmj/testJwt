@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.cjgmj.testJwt.auth.SimpleGrantedAuthorityMixin;
 import com.cjgmj.testJwt.auth.service.JWTService;
+import com.cjgmj.testJwt.model.UserEntity;
+import com.cjgmj.testJwt.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
@@ -21,14 +25,22 @@ import io.jsonwebtoken.Jwts;
 
 @Component
 public class JWTServiceImpl implements JWTService {
+	
+	@Autowired
+	private UserService userService;
 
 	@Override
 	public String create(Authentication auth) throws IOException {
 		String username = ((User) auth.getPrincipal()).getUsername();
+		Optional<UserEntity> user = userService.findByUsername(username);
 		Collection<? extends GrantedAuthority> roles = auth.getAuthorities();
 
 		Claims claims = Jwts.claims();
 		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+		if(user.isPresent()) {
+			claims.put("name", user.get().getName());
+			claims.put("surname", user.get().getSurname());
+		}
 
 		String token = Jwts.builder().setClaims(claims).setSubject(username).signWith(KEY).setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_DATE)).compact();
@@ -77,5 +89,4 @@ public class JWTServiceImpl implements JWTService {
 
 		return null;
 	}
-
 }

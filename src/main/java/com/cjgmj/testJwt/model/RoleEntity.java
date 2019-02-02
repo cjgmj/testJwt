@@ -21,6 +21,13 @@ public class RoleEntity implements Serializable {
 
 	private String authority;
 
+	public RoleEntity() {
+	}
+
+	public RoleEntity(String authority) {
+		this.authority = authority;
+	}
+
 	public Long getId() {
 		return id;
 	}

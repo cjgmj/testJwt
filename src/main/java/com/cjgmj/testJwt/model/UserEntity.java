@@ -42,6 +42,17 @@ public class UserEntity implements Serializable {
 	@JoinColumn(name = "user_id")
 	private List<RoleEntity> roles;
 
+	public UserEntity() {
+	}
+
+	public UserEntity(String name, String surname, String username, List<RoleEntity> roles) {
+		super();
+		this.name = name;
+		this.surname = surname;
+		this.username = username;
+		this.roles= roles;
+	}
+
 	public Long getId() {
 		return id;
 	}
