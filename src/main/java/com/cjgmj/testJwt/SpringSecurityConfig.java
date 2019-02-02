@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.cjgmj.testJwt.auth.filter.JWTAuthenticationFilter;
 import com.cjgmj.testJwt.auth.filter.JWTAuthorizationFilter;
+import com.cjgmj.testJwt.auth.service.JWTService;
 import com.cjgmj.testJwt.service.JpaUserDetailsService;
 
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
@@ -22,12 +23,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private JpaUserDetailsService userDetailsService;
+	
+	@Autowired
+	private JWTService jwtService;
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/").permitAll().anyRequest().authenticated().and()
-				.addFilter(new JWTAuthenticationFilter(authenticationManager()))
-				.addFilter(new JWTAuthorizationFilter(authenticationManager())).csrf().disable().sessionManagement()
+				.addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtService))
+				.addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtService)).csrf().disable().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 
