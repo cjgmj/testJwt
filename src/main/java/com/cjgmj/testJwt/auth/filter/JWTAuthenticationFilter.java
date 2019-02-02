@@ -21,6 +21,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.cjgmj.testJwt.model.UserEntity;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
@@ -41,18 +44,22 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 
-		String username = obtainUsername(request);
-		String password = obtainPassword(request);
+		String username = "";
+		String password = "";
 
-		if (username == null) {
-			username = "";
+		UserEntity user = null;
+
+		try {
+			user = new ObjectMapper().readValue(request.getInputStream(), UserEntity.class);
+			
+			username = user.getUsername().trim();
+			password = user.getPassword();
+			
+		} catch (JsonParseException | JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-
-		if (password == null) {
-			password = "";
-		}
-
-		username = username.trim();
 
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
 
