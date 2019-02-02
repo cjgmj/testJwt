@@ -51,10 +51,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		try {
 			user = new ObjectMapper().readValue(request.getInputStream(), UserEntity.class);
-			
+
 			username = user.getUsername().trim();
 			password = user.getPassword();
-			
+
 		} catch (JsonParseException | JsonMappingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -89,6 +89,20 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		response.getWriter().write(new ObjectMapper().writeValueAsString(body));
 		response.setStatus(200);
 		response.setContentType("application/json");
+	}
+
+	@Override
+	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException failed) throws IOException, ServletException {
+		
+		Map<String, Object> body = new HashMap<String, Object>();
+		body.put("mensaje", "Error de autenticación: usuario o contraseña incorrectos");
+		body.put("error", failed.getMessage());
+
+		response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+		response.setStatus(401);
+		response.setContentType("application/json");
+		
 	}
 
 }
