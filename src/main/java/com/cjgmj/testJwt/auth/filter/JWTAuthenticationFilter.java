@@ -35,6 +35,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private AuthenticationManager authenticationManager;
 
+	public static final Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
 	public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
 		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/user/login", "POST"));
@@ -70,14 +72,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 
-		Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 		String username = ((User) authResult.getPrincipal()).getUsername();
 		Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
 
 		Claims claims = Jwts.claims();
 		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
 
-		String token = Jwts.builder().setClaims(claims).setSubject(username).signWith(key).setIssuedAt(new Date())
+		String token = Jwts.builder().setClaims(claims).setSubject(username).signWith(KEY).setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + 3600000L)).compact();
 
 		response.addHeader("Authorization", "Bearer ".concat(token));
@@ -94,7 +95,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
-		
+
 		Map<String, Object> body = new HashMap<String, Object>();
 		body.put("mensaje", "Error de autenticación: usuario o contraseña incorrectos");
 		body.put("error", failed.getMessage());
@@ -102,7 +103,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		response.getWriter().write(new ObjectMapper().writeValueAsString(body));
 		response.setStatus(401);
 		response.setContentType("application/json");
-		
+
 	}
 
 }
