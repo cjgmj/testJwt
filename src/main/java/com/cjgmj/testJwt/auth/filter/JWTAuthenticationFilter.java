@@ -28,12 +28,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private AuthenticationManager authenticationManager;
 	private JWTService jwtService;
-	private LogoutService manageJwtService;
+	private LogoutService logoutService;
 
-	public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTService jwtService, LogoutService manageJwtService) {
+	public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTService jwtService, LogoutService logoutService) {
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
-		this.manageJwtService = manageJwtService;
+		this.logoutService = logoutService;
 		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/user/login", "POST"));
 	}
 
@@ -69,7 +69,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		String token = jwtService.create(authResult);
 		
-		manageJwtService.deleteByUsername(authResult.getName());
+		logoutService.deleteByUsername(authResult.getName());
 
 		response.addHeader(JWTService.HEADER_STRING, JWTService.TOKEN_PREFIX.concat(token));
 

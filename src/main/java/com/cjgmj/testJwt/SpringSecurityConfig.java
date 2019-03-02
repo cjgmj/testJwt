@@ -29,13 +29,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	private JWTService jwtService;
 
 	@Autowired
-	private LogoutService manageJwtService;
+	private LogoutService logoutService;
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/").permitAll().anyRequest().authenticated().and()
-				.addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtService, manageJwtService))
-				.addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtService, manageJwtService)).csrf()
+				.addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtService, logoutService))
+				.addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtService, logoutService)).csrf()
 				.disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 

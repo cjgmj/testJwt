@@ -18,13 +18,13 @@ import com.cjgmj.testJwt.auth.service.LogoutService;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 	private JWTService jwtService;
-	private LogoutService manageJwtService;
+	private LogoutService logoutService;
 
 	public JWTAuthorizationFilter(AuthenticationManager authenticationManager, JWTService jwtService,
-			LogoutService manageJwtService) {
+			LogoutService logoutService) {
 		super(authenticationManager);
 		this.jwtService = jwtService;
-		this.manageJwtService = manageJwtService;
+		this.logoutService = logoutService;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 			return;
 		}
 
-		if (manageJwtService.existsByUsername(jwtService.getUsername(header))) {
+		if (!jwtService.validate(header) || logoutService.existsByUsername(jwtService.getUsername(header))) {
 			chain.doFilter(request, response);
 			return;
 		}
