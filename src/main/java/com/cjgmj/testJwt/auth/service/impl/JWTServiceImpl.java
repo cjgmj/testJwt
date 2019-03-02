@@ -25,7 +25,7 @@ import io.jsonwebtoken.Jwts;
 
 @Component
 public class JWTServiceImpl implements JWTService {
-	
+
 	@Autowired
 	private UserService userService;
 
@@ -37,7 +37,7 @@ public class JWTServiceImpl implements JWTService {
 
 		Claims claims = Jwts.claims();
 		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
-		if(user.isPresent()) {
+		if (user.isPresent()) {
 			claims.put("name", user.get().getName());
 			claims.put("surname", user.get().getSurname());
 		}

@@ -12,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cjgmj.testJwt.auth.service.JWTService;
+import com.cjgmj.testJwt.auth.service.LogoutService;
 import com.cjgmj.testJwt.model.RoleEntity;
 import com.cjgmj.testJwt.model.UserEntity;
 
@@ -28,9 +30,12 @@ public class UserController {
 	@Autowired
 	private JWTService jwtService;
 
+	@Autowired
+	private LogoutService manageJWTService;
+
 	@GetMapping("/")
 	@Secured("ROLE_ADMIN")
-	public UserEntity login(HttpServletRequest request) {
+	public UserEntity getUser(HttpServletRequest request) {
 		String header = request.getHeader(JWTService.HEADER_STRING);
 		Claims claims = null;
 
@@ -41,6 +46,12 @@ public class UserController {
 		}
 
 		return null;
+	}
+
+	@PostMapping("/logout")
+	public void logout(HttpServletRequest request) {
+		String header = request.getHeader(JWTService.HEADER_STRING);
+		manageJWTService.logout(jwtService.resolve(header));
 	}
 
 	private List<RoleEntity> getRoles(String token) {

@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.cjgmj.testJwt.auth.service.JWTService;
+import com.cjgmj.testJwt.auth.service.LogoutService;
 import com.cjgmj.testJwt.model.UserEntity;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,10 +28,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private AuthenticationManager authenticationManager;
 	private JWTService jwtService;
+	private LogoutService manageJwtService;
 
-	public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTService jwtService) {
+	public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTService jwtService, LogoutService manageJwtService) {
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
+		this.manageJwtService = manageJwtService;
 		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/user/login", "POST"));
 	}
 
@@ -65,6 +68,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			Authentication authResult) throws IOException, ServletException {
 
 		String token = jwtService.create(authResult);
+		
+		manageJwtService.deleteByUsername(authResult.getName());
 
 		response.addHeader(JWTService.HEADER_STRING, JWTService.TOKEN_PREFIX.concat(token));
 

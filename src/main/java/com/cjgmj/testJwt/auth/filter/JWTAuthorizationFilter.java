@@ -13,14 +13,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.cjgmj.testJwt.auth.service.JWTService;
+import com.cjgmj.testJwt.auth.service.LogoutService;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 	private JWTService jwtService;
+	private LogoutService manageJwtService;
 
-	public JWTAuthorizationFilter(AuthenticationManager authenticationManager, JWTService jwtService) {
+	public JWTAuthorizationFilter(AuthenticationManager authenticationManager, JWTService jwtService,
+			LogoutService manageJwtService) {
 		super(authenticationManager);
 		this.jwtService = jwtService;
+		this.manageJwtService = manageJwtService;
 	}
 
 	@Override
@@ -29,6 +33,11 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 		String header = request.getHeader(JWTService.HEADER_STRING);
 
 		if (!requiresAutentication(header)) {
+			chain.doFilter(request, response);
+			return;
+		}
+
+		if (manageJwtService.existsByUsername(jwtService.getUsername(header))) {
 			chain.doFilter(request, response);
 			return;
 		}
