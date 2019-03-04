@@ -19,6 +19,7 @@ public interface JWTService {
 	public static final String HEADER_STRING = "Authorization";
 
 	public String create(Authentication auth) throws IOException;
+	public String create(String username, Object authorities) throws IOException;
 	public boolean validate(String token);
 	public Claims getClaims(String token);
 	public String getUsername(String token);

@@ -31,7 +31,7 @@ public class UserController {
 	private JWTService jwtService;
 
 	@Autowired
-	private LogoutService manageJWTService;
+	private LogoutService logoutService;
 
 	@GetMapping("/")
 	@Secured("ROLE_ADMIN")
@@ -51,7 +51,7 @@ public class UserController {
 	@PostMapping("/logout")
 	public void logout(HttpServletRequest request) {
 		String header = request.getHeader(JWTService.HEADER_STRING);
-		manageJWTService.logout(jwtService.resolve(header));
+		logoutService.logout(jwtService.resolve(header));
 	}
 
 	private List<RoleEntity> getRoles(String token) {

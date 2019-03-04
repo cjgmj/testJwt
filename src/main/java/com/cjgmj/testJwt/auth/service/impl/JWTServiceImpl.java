@@ -49,6 +49,26 @@ public class JWTServiceImpl implements JWTService {
 	}
 
 	@Override
+	public String create(String username, Object authorities) throws IOException {
+		Optional<UserEntity> user = userService.findByUsername(username);
+		Collection<? extends GrantedAuthority> roles = Arrays
+				.asList(new ObjectMapper().addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+						.readValue(authorities.toString().getBytes(), SimpleGrantedAuthority[].class));
+
+		Claims claims = Jwts.claims();
+		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+		if (user.isPresent()) {
+			claims.put("name", user.get().getName());
+			claims.put("surname", user.get().getSurname());
+		}
+
+		String token = Jwts.builder().setClaims(claims).setSubject(username).signWith(KEY).setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_DATE)).compact();
+		
+		return token;
+	}
+
+	@Override
 	public boolean validate(String token) {
 		try {
 			getClaims(token);
