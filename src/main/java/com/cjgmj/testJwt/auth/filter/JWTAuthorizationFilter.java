@@ -42,8 +42,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 			return;
 		}
 
+		String username = null;
 		try {
-			jwtService.getUsername(header);
+			username = jwtService.getUsername(header);
 		} catch (ExpiredJwtException e) {
 			String token = jwtService.create(e.getClaims().getSubject(), e.getClaims().get("authorities"));
 			response.addHeader(JWTService.HEADER_STRING, JWTService.TOKEN_PREFIX.concat(token));
@@ -60,14 +61,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 			return;
 		}
 		
-		if (!jwtService.validate(header) || logoutService.existsByUsername(jwtService.getUsername(header))) {
+		if (!jwtService.validate(header) || logoutService.existsByUsername(username)) {
 			chain.doFilter(request, response);
 			return;
 		}
 
 		UsernamePasswordAuthenticationToken authentication = null;
 		if (jwtService.validate(header)) {
-			authentication = new UsernamePasswordAuthenticationToken(jwtService.getUsername(header), null,
+			authentication = new UsernamePasswordAuthenticationToken(username, null,
 					jwtService.getRoles(header));
 		}
 
